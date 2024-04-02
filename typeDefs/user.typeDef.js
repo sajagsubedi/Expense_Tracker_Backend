@@ -10,14 +10,13 @@ type User{
 }
 
 type Query{
-  users:[User!]
   authUser: User
   user(userId:ID!):User
 }
 
 type Mutation{
   signup(input:SignUpInput):User!
-  sigin(input:SignInInput):User!
+  signin(input:SignInInput):User!
   logout:LogoutResponse
 }
 
