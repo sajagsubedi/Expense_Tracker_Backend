@@ -1,6 +1,5 @@
 import User from "../models/user.model.js";
 import bcrypt from "bcryptjs";
-import crypto from "crypto";
 
 const userResolver = {
     Query: {
@@ -29,19 +28,15 @@ const userResolver = {
                 if (!email || !name || !password || !gender) {
                     throw new Error("All fields are required");
                 }
-                const existingUser = User.findOne({ email });
+                const existingUser =await User.findOne({ email });
 
                 if (existingUser) {
-                    throw new Error("User with rhe given email already exists");
+                    throw new Error("User with the given email already exists");
                 }
 
                 const salt = await bcrypt.genSalt(10);
                 const hashedPassword = await bcrypt.hash(password, salt);
-                const hashedEmail = await crypto
-                    .createHash("md5")
-                    .update(email.toLowerCase().trim())
-                    .digest("hex");
-                const profilePicture = `https://www.gravatar.com/avatar/${hashedEmail}`;
+                const profilePicture = `https://www.gravatar.com/avatar`;
 
                 const newUser = await User.create({
                     email,
