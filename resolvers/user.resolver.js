@@ -66,13 +66,13 @@ const userResolver = {
         throw new Error(err.message || "Internal Server Error");
       }
     },
-    logout: (_, __, context) => {
+    logout: async (_, __, context) => {
       try {
-        context.logout();
-        context.req.session.destroy((err) => {
+        await context.logout();
+        await context.req.session.destroy((err) => {
           if (err) throw err;
         });
-        context.res.clearCookie("connect.sid");
+        await context.res.clearCookie("connect.sid");
         return { message: "Logged Out successfully!" };
       } catch (err) {
         throw new Error(err.message || "Internal Server Error");
