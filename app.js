@@ -18,7 +18,6 @@ dotenv.config();
 configurePassport();
 
 const app = express();
-
 const PORT = process.env.PORT || 3000;
 const MONGO_URI = process.env.MONGO_URI;
 const sessionSecret = process.env.SESSION_SECRET || "expensetracker123";
@@ -30,6 +29,15 @@ const store = new MongoDBStore({
   collection: "sessions",
 });
 store.on("error", (err) => console.log(err));
+
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN || "*",
+    credentials: true,
+  })
+);
+
+app.use(express.json());
 
 app.use(
   session({
@@ -54,21 +62,16 @@ const server = new ApolloServer({
 });
 await server.start();
 
+app.options("/graphql", cors());
+
 app.use(
   "/graphql",
-  cors({
-    origin: process.env.CORS_ORIGIN,
-    credentials: true,
-  }),
-  express.json(),
   expressMiddleware(server, {
-    context: async ({ req, res }) => {
-      return buildContext({ req, res });
-    9},
+    context: async ({ req, res }) => buildContext({ req, res }),
   })
 );
 
 await new Promise((resolve) => httpServer.listen({ port: PORT }, resolve));
 await connectToDB(MONGO_URI);
 
-console.log(`🚀 Server ready at http://localhost:${PORT}/`);
+console.log(`🚀 Server ready at http://localhost:${PORT}/graphql`);
